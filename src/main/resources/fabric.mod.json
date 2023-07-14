@@ -16,18 +16,10 @@
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-			"pose.api.ExampleMod"
-		],
-		"client": [
-			"pose.api.ExampleModClient"
+			"pose.api.Pose_API"
 		]
 	},
 	"mixins": [
-		"pose-api.mixins.json",
-		{
-			"config": "pose-api.client.mixins.json",
-			"environment": "client"
-		}
 	],
 	"depends": {
 		"fabricloader": ">=0.14.21",
