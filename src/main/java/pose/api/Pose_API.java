@@ -15,6 +15,7 @@ public class Pose_API implements ModInitializer {
 	// That way, it's clear which mod wrote info, warnings, and errors.
     public static final Logger LOGGER = LoggerFactory.getLogger("pose-api");
 	private static MinecraftClient client;
+	float yaw;
 
 	@Override
 	public void onInitialize() {
@@ -34,7 +35,7 @@ public class Pose_API implements ModInitializer {
             ClientPlayerEntity player = client.player;
             if (player != null) {
                 Vec3d pos = player.getPos();
-				float yaw = player.getYaw() % 360.0f;
+				yaw = player.getYaw() % 360.0f;
 				float pitch = player.getPitch();
 
 				if (yaw < 0)
@@ -43,10 +44,5 @@ public class Pose_API implements ModInitializer {
                 LOGGER.info("Player position: X=" + pos.x + " Y=" + pos.y + " Z=" + pos.z + " Yaw=" + yaw + " Pitch=" + pitch);
             }
         }
-	}
-
-	public float getYaw() {
-
-
 	}
 }
