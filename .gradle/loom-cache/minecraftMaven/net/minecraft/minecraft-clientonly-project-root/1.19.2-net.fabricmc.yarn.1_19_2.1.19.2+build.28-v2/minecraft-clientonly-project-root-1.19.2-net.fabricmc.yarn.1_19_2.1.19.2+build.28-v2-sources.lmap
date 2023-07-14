@@ -1553,7 +1553,7 @@ net/minecraft/client/MinecraftClient	2882	2631
 	1194	1117
 	1196	1118
 	1197	1119
-	1198	1121
+	1198	1120
 	1201	1124
 	1202	1125
 	1204	1126
@@ -2366,8 +2366,8 @@ net/minecraft/client/Mouse	330	307
 	90	86
 	92	87
 	93	88
-	94	90
-	96	94
+	94	89
+	96	93
 	99	99
 	100	100
 	101	101
@@ -3101,7 +3101,7 @@ net/minecraft/client/font/TrueTypeFont	100	96
 	79	77
 	80	78
 	82	79
-	83	80
+	83	81
 	87	84
 	93	90
 	94	91
@@ -5007,8 +5007,8 @@ net/minecraft/client/gui/hud/ChatHud	437	401
 	433	397
 	437	401
 
-net/minecraft/client/gui/hud/ChatHudLine	9	18
-	9	18
+net/minecraft/client/gui/hud/ChatHudLine	9	23
+	9	23
 
 net/minecraft/client/gui/hud/ClientBossBar	36	40
 	16	22
@@ -8203,7 +8203,7 @@ net/minecraft/client/gui/screen/TitleScreen	370	346
 	175	167
 	176	345
 	178	346
-	180	168
+	180	341
 	185	173
 	186	174
 	190	177
@@ -10748,7 +10748,7 @@ net/minecraft/client/gui/screen/ingame/JigsawBlockScreen	227	198
 	123	111
 	127	114
 	129	115
-	145	130
+	145	131
 	147	133
 	149	134
 	150	135
@@ -13362,7 +13362,7 @@ net/minecraft/client/gui/screen/world/CreateWorldScreen	670	590
 	249	206
 	250	207
 	251	208
-	252	210
+	252	209
 	255	213
 	257	214
 	260	215
@@ -13621,7 +13621,7 @@ net/minecraft/client/gui/screen/world/EditWorldScreen	212	203
 	131	126
 	133	127
 	134	128
-	135	129
+	135	130
 	136	132
 	138	133
 	143	138
@@ -13684,7 +13684,7 @@ net/minecraft/client/gui/screen/world/MoreOptionsDialog	276	256
 	79	86
 	81	87
 	82	88
-	83	90
+	83	89
 	84	92
 	86	93
 	87	94
@@ -16302,7 +16302,7 @@ net/minecraft/client/network/ClientPlayNetworkHandler	2405	2115
 	1534	1370
 	1535	1371
 	1536	1372
-	1539	1375
+	1539	1374
 	1540	1377
 	1542	1379
 	1544	1381
@@ -22441,8 +22441,8 @@ net/minecraft/client/realms/gui/screen/RealmsNotificationsScreen	165	149
 	58	59
 	59	60
 	64	65
-	66	66
-	67	69
+	66	67
+	67	70
 	68	72
 	69	73
 	70	74
@@ -22700,7 +22700,7 @@ net/minecraft/client/realms/gui/screen/RealmsResetNormalWorldScreen	81	74
 	45	47
 	47	48
 	50	49
-	52	52
+	52	51
 	54	54
 	58	55
 	63	60
@@ -23039,7 +23039,7 @@ net/minecraft/client/realms/gui/screen/RealmsSlotOptionsScreen	306	225
 	156	133
 	157	134
 	158	135
-	160	136
+	160	137
 	162	139
 	165	140
 	168	142
@@ -23052,9 +23052,9 @@ net/minecraft/client/realms/gui/screen/RealmsSlotOptionsScreen	306	225
 	181	154
 	185	157
 	186	158
-	187	159
+	187	160
 	188	162
-	189	165
+	189	166
 	191	168
 	192	169
 	193	170
@@ -24729,9 +24729,9 @@ net/minecraft/client/render/GameRenderer	1454	1420
 	439	396
 	441	397
 	444	399
-	445	403
+	445	402
 	446	405
-	447	409
+	447	408
 	448	411
 	449	414
 	450	417
@@ -24743,20 +24743,20 @@ net/minecraft/client/render/GameRenderer	1454	1420
 	457	435
 	458	438
 	459	441
-	460	445
+	460	444
 	461	447
 	462	450
-	463	453
+	463	454
 	464	456
 	465	459
 	466	462
 	467	465
-	468	468
-	469	471
+	468	469
+	469	472
 	470	474
 	471	477
-	472	481
-	473	484
+	472	480
+	473	483
 	474	486
 	475	489
 	476	492
@@ -24764,7 +24764,7 @@ net/minecraft/client/render/GameRenderer	1454	1420
 	478	498
 	479	501
 	480	504
-	481	508
+	481	507
 	482	510
 	483	513
 	484	516
@@ -24772,17 +24772,17 @@ net/minecraft/client/render/GameRenderer	1454	1420
 	486	522
 	487	525
 	488	528
-	489	532
+	489	531
 	490	534
 	491	537
-	492	541
+	492	540
 	493	543
 	494	546
 	495	549
 	496	552
 	497	555
-	498	559
-	499	562
+	498	558
+	499	561
 	501	565
 	505	568
 	507	569
@@ -30053,7 +30053,7 @@ net/minecraft/client/render/debug/StructureDebugRenderer	90	87
 	89	86
 	90	87
 
-net/minecraft/client/render/debug/VillageDebugRenderer	404	326
+net/minecraft/client/render/debug/VillageDebugRenderer	404	327
 	93	83
 	98	88
 	99	89
@@ -30175,7 +30175,7 @@ net/minecraft/client/render/debug/VillageDebugRenderer	404	326
 	394	318
 	396	319
 	400	322
-	404	326
+	404	327
 
 net/minecraft/client/render/debug/VillageSectionsDebugRenderer	64	64
 	25	29
@@ -33246,8 +33246,8 @@ net/minecraft/client/render/entity/feature/WardenFeatureRenderer	48	58
 	37	43
 	38	44
 	42	48
-	43	50
-	44	53
+	43	49
+	44	52
 	48	58
 
 net/minecraft/client/render/entity/feature/WitchHeldItemFeatureRenderer	34	40
@@ -37771,7 +37771,7 @@ net/minecraft/client/render/model/ModelLoader	522	486
 	388	350
 	391	352
 	393	354
-	394	355
+	394	356
 	396	357
 	397	358
 	401	362
@@ -43521,8 +43521,8 @@ net/minecraft/client/world/ClientChunkManager	158	156
 	153	147
 	158	151
 
-net/minecraft/client/world/ClientWorld	1044	758
-	91	758
+net/minecraft/client/world/ClientWorld	1044	762
+	91	762
 	112	122
 	113	123
 	114	124
