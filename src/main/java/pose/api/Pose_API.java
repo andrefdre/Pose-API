@@ -39,7 +39,7 @@ public class Pose_API implements ModInitializer, HttpHandler {
 		client = MinecraftClient.getInstance();
 
 		ClientTickEvents.START_CLIENT_TICK.register(client -> {
-			onUpdate();
+			getPos();
 		});
 
 		// Create an Undertow server instance
@@ -53,7 +53,7 @@ public class Pose_API implements ModInitializer, HttpHandler {
 
 		}
 
-	public void onUpdate() {
+	public void getPos() {
 		if (client != null) {
             ClientPlayerEntity player = client.player;
             if (player != null) {
