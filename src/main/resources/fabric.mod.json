@@ -1,9 +1,9 @@
 {
 	"schemaVersion": 1,
-	"id": "pose-api",
+	"id": "movement_api",
 	"version": "${version}",
-	"name": "Pose API",
-	"description": "This is an example description! Tell everyone what your mod is about!",
+	"name": "Movement_API",
+	"description": "Programming in Java was the worst pain I've ever experienced...",
 	"authors": [
 		"Me!"
 	],
@@ -12,22 +12,15 @@
 		"sources": "https://github.com/FabricMC/fabric-example-mod"
 	},
 	"license": "CC0-1.0",
-	"icon": "assets/pose-api/icon.png",
+	"icon": "assets/movement_api/icon.png",
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-			"pose.api.ExampleMod"
-		],
-		"client": [
-			"pose.api.ExampleModClient"
+			"ai_api.AI_API"
 		]
 	},
 	"mixins": [
-		"pose-api.mixins.json",
-		{
-			"config": "pose-api.client.mixins.json",
-			"environment": "client"
-		}
+		"movement_api.mixins.json"
 	],
 	"depends": {
 		"fabricloader": ">=0.14.21",

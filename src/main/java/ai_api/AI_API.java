@@ -1,10 +1,18 @@
-package pose.api;
+package ai_api;
 
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.Vec3d;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import java.util.List;
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +24,7 @@ import io.undertow.server.HttpServerExchange;
 import io.undertow.server.RoutingHandler;
 import io.undertow.util.Headers;
 
-public class Pose_API implements ModInitializer, HttpHandler {
+public class AI_API implements ModInitializer, HttpHandler {
 	// This logger is used to write text to the console and the log file.
 	// It is considered best practice to use your mod id as the logger's name.
 	// That way, it's clear which mod wrote info, warnings, and errors.
@@ -27,6 +35,8 @@ public class Pose_API implements ModInitializer, HttpHandler {
 	double z;
 	float yaw;
 	float pitch;
+    List<Item> itemTypesList = new ArrayList<>();
+	List<Integer> itemCount = new ArrayList<>();
 
 	private Undertow server;
 
@@ -40,6 +50,7 @@ public class Pose_API implements ModInitializer, HttpHandler {
 
 		ClientTickEvents.START_CLIENT_TICK.register(client -> {
 			getPos();
+            getInv();
 		});
 
 		// Create an Undertow server instance
@@ -73,6 +84,27 @@ public class Pose_API implements ModInitializer, HttpHandler {
         }
 	}
 
+    public void getInv() {
+		if (client != null) {
+            PlayerEntity player = client.player;
+            if (player != null) {
+				DefaultedList<ItemStack> playerInventory = player.getInventory().main;
+				
+				LOGGER.info("Player Inventory:");
+
+				for (int i = 0; i < playerInventory.size(); i++) {
+					ItemStack itemStack = playerInventory.get(i);
+					LOGGER.info("Slot " + i + ": " + itemStack.getItem().getTranslationKey() + " (Count: " + itemStack.getCount() + ")");
+					Item item = itemStack.getItem();
+					itemTypesList.add(item);
+				}
+				
+
+				LOGGER.info("");
+			}
+	    }
+    }
+
 	private RoutingHandler getRoutingHandler() {
         // Create a routing handler to handle different API endpoints
         RoutingHandler routingHandler = new RoutingHandler();
@@ -80,6 +112,10 @@ public class Pose_API implements ModInitializer, HttpHandler {
         // Add a route for the /player endpoint
         routingHandler.get("/player", exchange -> {
             handlePlayerRequest(exchange);
+        });
+
+        routingHandler.get("/player_inv", exchange -> {
+            handlePlayerInvRequest(exchange);
         });
 
         return routingHandler;
@@ -96,6 +132,22 @@ public class Pose_API implements ModInitializer, HttpHandler {
                 exchange.getResponseSender().send(playerData);
             }
         }
+
+    private void handlePlayerInvRequest(HttpServerExchange exchange) {
+        // Retrieve the player's position and orientation
+        if (client != null) {
+                
+			StringBuilder player_inventory = new StringBuilder();
+				for (int i = 0; i < itemTypesList.size(); i++) {					
+					player_inventory.append("Slot " + i + ": " + itemTypesList.get(i) + "\n");
+				}
+                // Set the response content type and send the player data as the response
+                exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "text/plain");
+                ByteBuffer byteBuffer = StandardCharsets.UTF_8.encode(player_inventory.toString());
+				exchange.getResponseSender().send(byteBuffer);
+            }
+			
+    }
 
     @Override
     public void handleRequest(HttpServerExchange exchange) throws Exception {
