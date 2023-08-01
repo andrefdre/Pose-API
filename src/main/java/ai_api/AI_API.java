@@ -30,11 +30,26 @@ public class AI_API implements ModInitializer, HttpHandler {
 	// That way, it's clear which mod wrote info, warnings, and errors.
     public static final Logger LOGGER = LoggerFactory.getLogger("pose-api");
 	private static MinecraftClient client;
+    
+    // variables for the player_actions functions
+    public static boolean left; 
+    public static boolean right;
+    public static boolean up;
+    public static boolean down;
+    public static boolean jump;
+    public static boolean crouch;
+    public static boolean sprint;
+    public static boolean left_mouse;
+    public static boolean right_mouse;
+
+    // variables for the player_position functions
 	double x;
 	double y;
 	double z;
 	float yaw;
 	float pitch;
+
+    // variables for the player_inventory functions
     List<Item> itemTypesList = new ArrayList<>();
 	List<Integer> itemCount = new ArrayList<>();
 
@@ -62,8 +77,11 @@ public class AI_API implements ModInitializer, HttpHandler {
         // Start the server
         server.start();
 
+        MouseInputHandler.init();
+
 		}
 
+ 
 	public void getPos() {
 		if (client != null) {
             ClientPlayerEntity player = client.player;
@@ -84,12 +102,97 @@ public class AI_API implements ModInitializer, HttpHandler {
         }
 	}
 
+
+    public class MouseInputHandler {
+        public static void init() {
+
+            // Register a client tick event to handle input on every game tick
+            ClientTickEvents.END_CLIENT_TICK.register(client -> {
+                // Handle your mouse input here
+                // if (client.mouse.wasLeftButtonClicked()) {
+                if (client.options.attackKey.isPressed()) {
+                    // Left mouse button was clicked
+                    System.out.println("Left mouse button clicked!");
+                    left = true;
+                }
+                else {
+                    left = false;
+                }
+
+                // if (client.mouse.wasRightButtonClicked()) {
+                if (client.options.useKey.isPressed()) {
+                    // Left mouse button was clicked
+                    System.out.println("Right mouse button clicked!");
+                    right = true;
+                }
+                else {
+                    right = false;
+                }
+    
+                if (client.options.jumpKey.isPressed()) {
+                    System.out.println("Bro is jumping!");
+                    jump = true;
+                }
+                else {
+                    jump = false;
+                }
+
+                if (client.options.sprintKey.isPressed()) {
+                    System.out.println("My man is sprinting!");
+                    sprint = true;
+                }
+                else {
+                    sprint = false;
+                }
+
+                if (client.options.forwardKey.isPressed()) {
+                    System.out.println("Moving forward!");
+                    up = true;
+                }
+                else {
+                    up = false;
+                }
+
+                if (client.options.backKey.isPressed()) {
+                    System.out.println("Moving backwards!");
+                    down = true;
+                }
+                else {
+                    down = false;
+                }
+
+                if (client.options.leftKey.isPressed()) {
+                    System.out.println("Moving left!");
+                    left = true;
+                }    
+                else {
+                    left = false;
+                }           
+
+                if (client.options.rightKey.isPressed()) {
+                    System.out.println("Moving right!");
+                    right = true;
+                }
+                else {
+                    right = false;
+                }
+
+                if (client.options.sneakKey.isPressed()) {
+                    System.out.println("Crouching!");
+                    crouch = true;
+                }   
+                else {
+                    crouch = false;
+                }      
+
+            });
+        }
+    }
     public void getInv() {
 		if (client != null) {
             PlayerEntity player = client.player;
             if (player != null) {
 				DefaultedList<ItemStack> playerInventory = player.getInventory().main;
-				
 				// LOGGER.info("Player Inventory:");
                 itemTypesList.clear();
 
@@ -98,7 +201,9 @@ public class AI_API implements ModInitializer, HttpHandler {
 					ItemStack itemStack = playerInventory.get(i);
 					// LOGGER.info("Slot " + i + ": " + itemStack.getItem().getTranslationKey() + " (Count: " + itemStack.getCount() + ")");
 					Item item = itemStack.getItem();
+                    int amount = player.getInventory().count(item);
 					itemTypesList.add(item);
+                    itemCount.add(amount);
 				}
 				
 
@@ -112,12 +217,15 @@ public class AI_API implements ModInitializer, HttpHandler {
         RoutingHandler routingHandler = new RoutingHandler();
 
         // Add a route for the /player endpoint
-        routingHandler.get("/player", exchange -> {
+        routingHandler.get("/player_positions", exchange -> {
             handlePlayerRequest(exchange);
         });
 
         routingHandler.get("/player_inv", exchange -> {
             handlePlayerInvRequest(exchange);
+        });
+        routingHandler.get("/player_actions", exchange -> {
+            handlePlayerInputRequest(exchange);
         });
 
         return routingHandler;
@@ -141,22 +249,44 @@ public class AI_API implements ModInitializer, HttpHandler {
              
 			StringBuilder player_inventory = new StringBuilder();
             player_inventory.append("Hotbar inventory: \n");
-				for (int i = 0; i < 10; i++) {					
-					player_inventory.append("Slot " + i + ": " + itemTypesList.get(i) + "\n");
-				}
-                player_inventory.append("\nRemaining inventory: \n");
-                for (int i = 10; i < itemTypesList.size(); i++) {					
-					player_inventory.append("Slot " + i + ": " + itemTypesList.get(i) + "\n");
-				}
-                // Set the response content type and send the player data as the response
-                exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "text/plain");
-                ByteBuffer byteBuffer = StandardCharsets.UTF_8.encode(player_inventory.toString());
-				exchange.getResponseSender().send(byteBuffer);
+            for (int i = 0; i < 10; i++) {					
+                player_inventory.append("Slot " + i + ": " + itemTypesList.get(i) + ", amount: " + itemCount.get(i) + "\n");
             }
+            player_inventory.append("\nRemaining inventory: \n");
+            for (int i = 10; i < itemTypesList.size(); i++) {					
+                player_inventory.append("Slot " + i + ": " + itemTypesList.get(i) + ", amount: " + itemCount.get(i) + "\n");
+            }
+            // Set the response content type and send the player data as the response
+            exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "text/plain");
+            ByteBuffer byteBuffer = StandardCharsets.UTF_8.encode(player_inventory.toString());
+            exchange.getResponseSender().send(byteBuffer);
+        }
 			
-    }
+    }   
 
-
+    private void handlePlayerInputRequest(HttpServerExchange exchange) {
+        // Retrieve the player's position and orientation
+        if (client != null) {
+                
+            StringBuilder player_actions = new StringBuilder();
+            
+            player_actions.append("Right click status: " + right + "\n");
+            player_actions.append("Left click status " + left + "\n");
+            player_actions.append("Jump key status: " + jump + "\n");
+            player_actions.append("Crouch key status: " + crouch+ "\n");
+            player_actions.append("Sprint key status: "+ sprint + "\n");
+            player_actions.append("W key status: " + up + "\n");
+            player_actions.append("S key status: " + down + "\n");
+            player_actions.append("A key status: " + left + "\n");
+            player_actions.append("D key status: " + right + "\n");
+            
+            // Set the response content type and send the player data as the response
+            exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "text/plain");
+            ByteBuffer byteBuffer = StandardCharsets.UTF_8.encode(player_actions.toString());
+            exchange.getResponseSender().send(byteBuffer);
+        }
+			
+    }    
 
 
     @Override
