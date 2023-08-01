@@ -79,7 +79,7 @@ public class AI_API implements ModInitializer, HttpHandler {
 				y = pos.y;
 				z = pos.z;
 
-                LOGGER.info("Player position: X=" + pos.x + " Y=" + pos.y + " Z=" + pos.z + " Yaw=" + yaw + " Pitch=" + pitch);
+                // LOGGER.info("Player position: X=" + pos.x + " Y=" + pos.y + " Z=" + pos.z + " Yaw=" + yaw + " Pitch=" + pitch);
             }
         }
 	}
@@ -90,17 +90,17 @@ public class AI_API implements ModInitializer, HttpHandler {
             if (player != null) {
 				DefaultedList<ItemStack> playerInventory = player.getInventory().main;
 				
-				LOGGER.info("Player Inventory:");
+				// LOGGER.info("Player Inventory:");
 
 				for (int i = 0; i < playerInventory.size(); i++) {
 					ItemStack itemStack = playerInventory.get(i);
-					LOGGER.info("Slot " + i + ": " + itemStack.getItem().getTranslationKey() + " (Count: " + itemStack.getCount() + ")");
+					// LOGGER.info("Slot " + i + ": " + itemStack.getItem().getTranslationKey() + " (Count: " + itemStack.getCount() + ")");
 					Item item = itemStack.getItem();
 					itemTypesList.add(item);
 				}
 				
 
-				LOGGER.info("");
+				// LOGGER.info("");
 			}
 	    }
     }

@@ -1,18 +1,19 @@
 {
 	"schemaVersion": 1,
 	"id": "movement_api",
-	"version": "${version}",
-	"name": "Movement_API",
+	"version": "1.19.2",
+	"name": "AI_API",
 	"description": "Programming in Java was the worst pain I've ever experienced...",
 	"authors": [
-		"Me!"
+		"André Cardoso",
+		"José Cação"
 	],
 	"contact": {
 		"homepage": "https://fabricmc.net/",
 		"sources": "https://github.com/FabricMC/fabric-example-mod"
 	},
 	"license": "CC0-1.0",
-	"icon": "assets/movement_api/icon.png",
+	"icon": "assets/ai_api/icon.png",
 	"environment": "*",
 	"entrypoints": {
 		"main": [
