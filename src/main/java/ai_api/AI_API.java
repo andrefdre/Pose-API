@@ -55,7 +55,7 @@ public class AI_API implements ModInitializer, HttpHandler {
 
 		// Create an Undertow server instance
         server = Undertow.builder()
-                .addHttpListener(8080, "localhost")  // Set the desired port and hostname
+                .addHttpListener(8070, "localhost")  // Set the desired port and hostname
                 .setHandler(getRoutingHandler())  // Set the routing handler as the request handler
                 .build();
 
@@ -91,6 +91,8 @@ public class AI_API implements ModInitializer, HttpHandler {
 				DefaultedList<ItemStack> playerInventory = player.getInventory().main;
 				
 				// LOGGER.info("Player Inventory:");
+                itemTypesList.clear();
+
 
 				for (int i = 0; i < playerInventory.size(); i++) {
 					ItemStack itemStack = playerInventory.get(i);
@@ -136,9 +138,14 @@ public class AI_API implements ModInitializer, HttpHandler {
     private void handlePlayerInvRequest(HttpServerExchange exchange) {
         // Retrieve the player's position and orientation
         if (client != null) {
-                
+             
 			StringBuilder player_inventory = new StringBuilder();
-				for (int i = 0; i < itemTypesList.size(); i++) {					
+            player_inventory.append("Hotbar inventory: \n");
+				for (int i = 0; i < 10; i++) {					
+					player_inventory.append("Slot " + i + ": " + itemTypesList.get(i) + "\n");
+				}
+                player_inventory.append("\nRemaining inventory: \n");
+                for (int i = 10; i < itemTypesList.size(); i++) {					
 					player_inventory.append("Slot " + i + ": " + itemTypesList.get(i) + "\n");
 				}
                 // Set the response content type and send the player data as the response
@@ -148,6 +155,9 @@ public class AI_API implements ModInitializer, HttpHandler {
             }
 			
     }
+
+
+
 
     @Override
     public void handleRequest(HttpServerExchange exchange) throws Exception {
