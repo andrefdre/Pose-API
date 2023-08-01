@@ -55,7 +55,7 @@ public class AI_API implements ModInitializer, HttpHandler {
 
 		// Create an Undertow server instance
         server = Undertow.builder()
-                .addHttpListener(8080, "localhost")  // Set the desired port and hostname
+                .addHttpListener(8070, "localhost")  // Set the desired port and hostname
                 .setHandler(getRoutingHandler())  // Set the routing handler as the request handler
                 .build();
 
