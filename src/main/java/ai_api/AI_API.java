@@ -24,6 +24,7 @@ import io.undertow.server.HttpServerExchange;
 import io.undertow.server.RoutingHandler;
 import io.undertow.util.Headers;
 
+
 public class AI_API implements ModInitializer, HttpHandler {
 	// This logger is used to write text to the console and the log file.
 	// It is considered best practice to use your mod id as the logger's name.
@@ -41,6 +42,8 @@ public class AI_API implements ModInitializer, HttpHandler {
     public static boolean sprint;
     public static boolean left_mouse;
     public static boolean right_mouse;
+    public static double mouse_x;
+    public static double mouse_y;
 
     // variables for the player_position functions
 	double x;
@@ -66,6 +69,7 @@ public class AI_API implements ModInitializer, HttpHandler {
 		ClientTickEvents.START_CLIENT_TICK.register(client -> {
 			getPos();
             getInv();
+            InputHandler();
 		});
 
 		// Create an Undertow server instance
@@ -77,11 +81,16 @@ public class AI_API implements ModInitializer, HttpHandler {
         // Start the server
         server.start();
 
-        MouseInputHandler.init();
+        // Function that retrieves the inputs from the keys / mouse
+        // InputHandler.init();
 
 		}
 
- 
+
+    // ----------------------------------------------------------------------------------- //
+    // ------------------------ FUNCTIONS TO GET INFO FROM GAME -------------------------- //
+    // ----------------------------------------------------------------------------------- //
+
 	public void getPos() {
 		if (client != null) {
             ClientPlayerEntity player = client.player;
@@ -103,91 +112,92 @@ public class AI_API implements ModInitializer, HttpHandler {
 	}
 
 
-    public class MouseInputHandler {
-        public static void init() {
+    public void InputHandler() {
+        // Register a client tick event to handle input on every game tick
+        ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            // Handle your mouse input here
+            // if (client.mouse.wasLeftButtonClicked()) {
+            if (client.mouse.wasLeftButtonClicked()) {
+                // Left mouse button was clicked
+                System.out.println("Left mouse button clicked!");
+                left_mouse = true;
+            }
+            else {
+                left_mouse = false;
+            }
 
-            // Register a client tick event to handle input on every game tick
-            ClientTickEvents.END_CLIENT_TICK.register(client -> {
-                // Handle your mouse input here
-                // if (client.mouse.wasLeftButtonClicked()) {
-                if (client.options.attackKey.isPressed()) {
-                    // Left mouse button was clicked
-                    System.out.println("Left mouse button clicked!");
-                    left = true;
-                }
-                else {
-                    left = false;
-                }
+            // if (client.mouse.wasRightButtonClicked()) {
+            if (client.mouse.wasRightButtonClicked()) {
+                // Left mouse button was clicked
+                System.out.println("Right mouse button clicked!");
+                right_mouse = true;
+            }
+            else {
+                right_mouse = false;
+            }
 
-                // if (client.mouse.wasRightButtonClicked()) {
-                if (client.options.useKey.isPressed()) {
-                    // Left mouse button was clicked
-                    System.out.println("Right mouse button clicked!");
-                    right = true;
-                }
-                else {
-                    right = false;
-                }
-    
-                if (client.options.jumpKey.isPressed()) {
-                    System.out.println("Bro is jumping!");
-                    jump = true;
-                }
-                else {
-                    jump = false;
-                }
+            if (client.options.jumpKey.isPressed()) {
+                System.out.println("Bro is jumping!");
+                jump = true;
+            }
+            else {
+                jump = false;
+            }
 
-                if (client.options.sprintKey.isPressed()) {
-                    System.out.println("My man is sprinting!");
-                    sprint = true;
-                }
-                else {
-                    sprint = false;
-                }
+            if (client.options.sprintKey.isPressed()) {
+                System.out.println("My man is sprinting!");
+                sprint = true;
+            }
+            else {
+                sprint = false;
+            }
 
-                if (client.options.forwardKey.isPressed()) {
-                    System.out.println("Moving forward!");
-                    up = true;
-                }
-                else {
-                    up = false;
-                }
+            if (client.options.forwardKey.isPressed()) {
+                System.out.println("Moving forward!");
+                up = true;
+            }
+            else {
+                up = false;
+            }
 
-                if (client.options.backKey.isPressed()) {
-                    System.out.println("Moving backwards!");
-                    down = true;
-                }
-                else {
-                    down = false;
-                }
+            if (client.options.backKey.isPressed()) {
+                System.out.println("Moving backwards!");
+                down = true;
+            }
+            else {
+                down = false;
+            }
 
-                if (client.options.leftKey.isPressed()) {
-                    System.out.println("Moving left!");
-                    left = true;
-                }    
-                else {
-                    left = false;
-                }           
+            if (client.options.leftKey.isPressed()) {
+                System.out.println("Moving left!");
+                left = true;
+            }    
+            else {
+                left = false;
+            }           
 
-                if (client.options.rightKey.isPressed()) {
-                    System.out.println("Moving right!");
-                    right = true;
-                }
-                else {
-                    right = false;
-                }
+            if (client.options.rightKey.isPressed()) {
+                System.out.println("Moving right!");
+                right = true;
+            }
+            else {
+                right = false;
+            }
 
-                if (client.options.sneakKey.isPressed()) {
-                    System.out.println("Crouching!");
-                    crouch = true;
-                }   
-                else {
-                    crouch = false;
-                }      
+            if (client.options.sneakKey.isPressed()) {
+                System.out.println("Crouching!");
+                crouch = true;
+            }   
+            else {
+                crouch = false;
+            }      
+            mouse_x = client.mouse.getX();
+            mouse_y = client.mouse.getY();
+            System.out.println("Mouse X: " + mouse_x + ", Mouse Y: " + mouse_y);
 
-            });
-        }
+        });
     }
+
     public void getInv() {
 		if (client != null) {
             PlayerEntity player = client.player;
@@ -206,11 +216,14 @@ public class AI_API implements ModInitializer, HttpHandler {
                     itemCount.add(amount);
 				}
 				
-
-				// LOGGER.info("");
 			}
 	    }
     }
+    
+    
+    // ----------------------------------------------------------------------------------- //
+    // --------------------- FUNCTION THAT HANDLES THE API REQUESTS ---------------------- //
+    // ----------------------------------------------------------------------------------- //
 
 	private RoutingHandler getRoutingHandler() {
         // Create a routing handler to handle different API endpoints
@@ -231,7 +244,12 @@ public class AI_API implements ModInitializer, HttpHandler {
         return routingHandler;
     }
 
-	private void handlePlayerRequest(HttpServerExchange exchange) {
+
+    // ----------------------------------------------------------------------------------- //
+    // -------------------- FUNCTIONS THAT PRINT OUT INFO TO THE API --------------------- //
+    // ----------------------------------------------------------------------------------- //
+
+    private void handlePlayerRequest(HttpServerExchange exchange) {
         // Retrieve the player's position and orientation
         if (client != null) {
                 String playerData = "Player position: X=" + x + " Y=" + y + " Z=" + z +
@@ -270,8 +288,8 @@ public class AI_API implements ModInitializer, HttpHandler {
                 
             StringBuilder player_actions = new StringBuilder();
             
-            player_actions.append("Right click status: " + right + "\n");
-            player_actions.append("Left click status " + left + "\n");
+            player_actions.append("Right click status: " + right_mouse + "\n");
+            player_actions.append("Left click status " + left_mouse + "\n");
             player_actions.append("Jump key status: " + jump + "\n");
             player_actions.append("Crouch key status: " + crouch+ "\n");
             player_actions.append("Sprint key status: "+ sprint + "\n");
@@ -279,7 +297,10 @@ public class AI_API implements ModInitializer, HttpHandler {
             player_actions.append("S key status: " + down + "\n");
             player_actions.append("A key status: " + left + "\n");
             player_actions.append("D key status: " + right + "\n");
-            
+            player_actions.append("\n");
+            player_actions.append("Mouse X position: " + mouse_x + "\n");
+            player_actions.append("Mouse Y position: " + mouse_y + "\n");
+                        
             // Set the response content type and send the player data as the response
             exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "text/plain");
             ByteBuffer byteBuffer = StandardCharsets.UTF_8.encode(player_actions.toString());
@@ -288,7 +309,7 @@ public class AI_API implements ModInitializer, HttpHandler {
 			
     }    
 
-
+    
     @Override
     public void handleRequest(HttpServerExchange exchange) throws Exception {
         // This method is required by the HttpHandler interface but can be left empty
