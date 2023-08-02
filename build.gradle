@@ -56,7 +56,6 @@ dependencies {
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
 	// modImplementation makes it available in the development environment. include makes it available everywhere via JAR-in-JAR.
-	// implementation include ('io.undertow:undertow-servlet:2.2.10.Final')
 	include 'org.jboss.logging:jboss-logging:3.4.2.Final'
 	include 'org.jboss.threads:jboss-threads:3.4.2.Final'
 	include 'org.jboss.xnio:xnio-nio:3.8.4.Final'
