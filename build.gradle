@@ -11,6 +11,8 @@ base {
 }
 
 repositories {
+	mavenCentral()
+	google()
 	// Add repositories to retrieve artifacts from in here.
 	// You should only use this when depending on other mods because
 	// Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
@@ -43,6 +45,7 @@ sourceSets {
 		}
 	}
 }
+
 dependencies {
 	// To change the versions see the gradle.properties file
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
@@ -52,8 +55,17 @@ dependencies {
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-	implementation 'io.undertow:undertow-core:2.2.10.Final'
-	
+	// modImplementation makes it available in the development environment. include makes it available everywhere via JAR-in-JAR.
+	// implementation include ('io.undertow:undertow-servlet:2.2.10.Final')
+	include 'org.jboss.logging:jboss-logging:3.4.2.Final'
+	include 'org.jboss.threads:jboss-threads:3.4.2.Final'
+	include 'org.jboss.xnio:xnio-nio:3.8.4.Final'
+	include 'org.jboss.xnio:xnio-api:3.8.4.Final'
+	include 'org.wildfly.client:wildfly-client-config:1.0.1.Final'
+	include 'org.wildfly.common:wildfly-common:1.5.2.Final'
+
+	implementation include ('io.undertow:undertow-core:2.2.12.Final')
+
 	// Uncomment the following line to enable the deprecated Fabric API modules. 
 	// These are included in the Fabric API production distribution and allow you to update your mod to the latest modules at a later more convenient time.
 
@@ -85,7 +97,7 @@ java {
 jar {
 	from("LICENSE") {
 		rename { "${it}_${project.base.archivesName.get()}"}
-	}
+	}	
 }
 
 // configure the maven publication
