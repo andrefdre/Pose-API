@@ -13,6 +13,15 @@ import java.util.List;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.minecraft.client.MinecraftClient;
+import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferInt;
+
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,6 +67,9 @@ public class AI_API implements ModInitializer, HttpHandler {
 
 	private Undertow server;
 
+
+
+
 	@Override
 	public void onInitialize() {
 		// This code runs as soon as Minecraft is in a mod-load-ready state.
@@ -70,6 +82,7 @@ public class AI_API implements ModInitializer, HttpHandler {
 			getPos();
             getInv();
             InputHandler();
+            captureScreenshot();
 		});
 
 		// Create an Undertow server instance
@@ -81,11 +94,7 @@ public class AI_API implements ModInitializer, HttpHandler {
         // Start the server
         server.start();
 
-        // Function that retrieves the inputs from the keys / mouse
-        // InputHandler.init();
-
-		}
-
+    }
 
     // ----------------------------------------------------------------------------------- //
     // ------------------------ FUNCTIONS TO GET INFO FROM GAME -------------------------- //
@@ -110,7 +119,6 @@ public class AI_API implements ModInitializer, HttpHandler {
             }
         }
 	}
-
 
     public void InputHandler() {
         // Register a client tick event to handle input on every game tick
@@ -193,8 +201,8 @@ public class AI_API implements ModInitializer, HttpHandler {
             }      
             mouse_x = client.mouse.getX();
             mouse_y = client.mouse.getY();
-            System.out.println("Mouse X: " + mouse_x + ", Mouse Y: " + mouse_y);
-
+            // System.out.println("Mouse X: " + mouse_x + ", Mouse Y: " + mouse_y);
+            
         });
     }
 
@@ -220,7 +228,41 @@ public class AI_API implements ModInitializer, HttpHandler {
 	    }
     }
     
+    public void captureScreenshot() {
+        // Get the current framebuffer (the rendered image on the screen)
+        int width = client.getWindow().getFramebufferWidth();
+        int height = client.getWindow().getFramebufferHeight();
+        // int[] pixelData = new int[width * height];
+        // client.getFramebuffer().readPixels(0, 0, width, height, true);
+
+        // Extract pixel data from the framebuffer into the pixelData array
+        // Note: This will store the data in the ARGB format
+
+        // At this point, you have the pixel data in the pixelData array
+        // You can convert this data into a BufferedImage or manipulate it as needed.
+        BufferedImage bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        // bufferedImage.setRGB(0, 0, width, height, pixelData, 0, width);
+        int[] pixelData = ((DataBufferInt) bufferedImage.getRaster().getDataBuffer()).getData();
+        // Now, you can further process the BufferedImage as needed.
+        // For example, you can manipulate the pixel data, apply filters, etc.
+
+        // After processing, you can access the pixel data as follows:
+        // int[] processedPixelData = ((DataBufferInt) bufferedImage.getRaster().getDataBuffer()).getData();        
+        System.out.println(pixelData);
+
+    }
+
+
+        // Your further processing logic goes here.
+        // ...
+
+        // At this point, processedPixelData contains the bitmap data you need.
+
+        // You can also save the BufferedImage as a PNG or other formats if required:
+        // File outputFile = new File("output.png");
+        // ImageIO.write(bufferedImage, "PNG", outputFile);
     
+
     // ----------------------------------------------------------------------------------- //
     // --------------------- FUNCTION THAT HANDLES THE API REQUESTS ---------------------- //
     // ----------------------------------------------------------------------------------- //
@@ -309,7 +351,7 @@ public class AI_API implements ModInitializer, HttpHandler {
 			
     }    
 
-    
+
     @Override
     public void handleRequest(HttpServerExchange exchange) throws Exception {
         // This method is required by the HttpHandler interface but can be left empty

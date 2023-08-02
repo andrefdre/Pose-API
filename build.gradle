@@ -54,6 +54,7 @@ dependencies {
 
 	modImplementation "net.fabricmc.fabric-api:fabric-key-binding-api-v1:${project.fabric_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-renderer-api-v1:${project.fabric_version}"
+	
 	implementation 'io.undertow:undertow-core:2.2.10.Final'
 
 
