@@ -117,12 +117,11 @@ public class AI_API implements ModInitializer, HttpHandler {
 
     public void InputHandler() {
         // Register a client tick event to handle input on every game tick
-        ClientTickEvents.END_CLIENT_TICK.register(client -> {
             // Handle your mouse input here
             // if (client.mouse.wasLeftButtonClicked()) {
             if (client.mouse.wasLeftButtonClicked()) {
                 // Left mouse button was clicked
-                System.out.println("Left mouse button clicked!");
+                // LOGGER.info("Left mouse button clicked!");
                 left_mouse = true;
             }
             else {
@@ -132,7 +131,7 @@ public class AI_API implements ModInitializer, HttpHandler {
             // if (client.mouse.wasRightButtonClicked()) {
             if (client.mouse.wasRightButtonClicked()) {
                 // Left mouse button was clicked
-                System.out.println("Right mouse button clicked!");
+                // LOGGER.info("Right mouse button clicked!");
                 right_mouse = true;
             }
             else {
@@ -140,7 +139,7 @@ public class AI_API implements ModInitializer, HttpHandler {
             }
 
             if (client.options.jumpKey.isPressed()) {
-                System.out.println("Bro is jumping!");
+                // LOGGER.info("Bro is jumping!");
                 jump = true;
             }
             else {
@@ -148,7 +147,7 @@ public class AI_API implements ModInitializer, HttpHandler {
             }
 
             if (client.options.sprintKey.isPressed()) {
-                System.out.println("My man is sprinting!");
+                // LOGGER.info("My man is sprinting!");
                 sprint = true;
             }
             else {
@@ -156,7 +155,7 @@ public class AI_API implements ModInitializer, HttpHandler {
             }
 
             if (client.options.forwardKey.isPressed()) {
-                System.out.println("Moving forward!");
+                // LOGGER.info("Moving forward!");
                 up = true;
             }
             else {
@@ -164,7 +163,7 @@ public class AI_API implements ModInitializer, HttpHandler {
             }
 
             if (client.options.backKey.isPressed()) {
-                System.out.println("Moving backwards!");
+                // LOGGER.info("Moving backwards!");
                 down = true;
             }
             else {
@@ -172,7 +171,7 @@ public class AI_API implements ModInitializer, HttpHandler {
             }
 
             if (client.options.leftKey.isPressed()) {
-                System.out.println("Moving left!");
+                // LOGGER.info("Moving left!");
                 left = true;
             }    
             else {
@@ -180,7 +179,7 @@ public class AI_API implements ModInitializer, HttpHandler {
             }           
 
             if (client.options.rightKey.isPressed()) {
-                System.out.println("Moving right!");
+                // LOGGER.info("Moving right!");
                 right = true;
             }
             else {
@@ -188,7 +187,7 @@ public class AI_API implements ModInitializer, HttpHandler {
             }
 
             if (client.options.sneakKey.isPressed()) {
-                System.out.println("Crouching!");
+                // LOGGER.info("Crouching!");
                 crouch = true;
             }   
             else {
@@ -196,9 +195,8 @@ public class AI_API implements ModInitializer, HttpHandler {
             }      
             mouse_x = client.mouse.getX();
             mouse_y = client.mouse.getY();
-            // System.out.println("Mouse X: " + mouse_x + ", Mouse Y: " + mouse_y);
+            // LOGGER.info("Mouse X: " + mouse_x + ", Mouse Y: " + mouse_y);
             
-        });
     }
 
     public void getInv() {
@@ -243,7 +241,7 @@ public class AI_API implements ModInitializer, HttpHandler {
 
         // After processing, you can access the pixel data as follows:
         // int[] processedPixelData = ((DataBufferInt) bufferedImage.getRaster().getDataBuffer()).getData();        
-        System.out.println(pixelData);
+        LOGGER.info(pixelData.toString());
 
     }
 
