@@ -15,11 +15,17 @@ import java.util.List;
 import javax.imageio.ImageIO;
 
 import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+
+import org.lwjgl.BufferUtils;
+import org.lwjgl.glfw.GLFW;
+import org.lwjgl.opengl.GL;
+import org.lwjgl.opengl.GL11;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,6 +58,7 @@ public class AI_API implements ModInitializer, HttpHandler {
     public static double mouse_x;
     public static double mouse_y;
     private static BufferedImage bufferedImage;
+    private static long window;
 
     // variables for the player_position functions
 	double x;
@@ -77,6 +84,10 @@ public class AI_API implements ModInitializer, HttpHandler {
 		LOGGER.info("Pose API initialized!");
 		client = MinecraftClient.getInstance();
 
+        int width = 720;
+        int height = 640;
+        initGL(width, height);
+
 		ClientTickEvents.START_CLIENT_TICK.register(client -> {
 			getPos();
             getInv();
@@ -93,6 +104,18 @@ public class AI_API implements ModInitializer, HttpHandler {
         // Start the server
         server.start();
 
+    }
+
+    private static void initGL(int width, int height) {
+        if (!GLFW.glfwInit()) {
+            throw new IllegalStateException("Unable to initialize GLFW");
+        }
+
+        GLFW.glfwDefaultWindowHints();
+        GLFW.glfwWindowHint(GLFW.GLFW_VISIBLE, GLFW.GLFW_FALSE);
+        window = GLFW.glfwCreateWindow(width, height, "Minecraft Screenshot", 0, 0);
+        GLFW.glfwMakeContextCurrent(window);
+        GL.createCapabilities();
     }
 
     // ----------------------------------------------------------------------------------- //
@@ -224,14 +247,29 @@ public class AI_API implements ModInitializer, HttpHandler {
 			}
 	    }
     }
+    
 
     private void captureScreenshot() {
         // Get the current framebuffer (the rendered image on the screen)
         int width = client.getWindow().getFramebufferWidth();
         int height = client.getWindow().getFramebufferHeight();
-        // int[] pixelData = new int[width * height];
-        // client.getFramebuffer().readPixels(0, 0, width, height, true);
-        bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        
+        GL11.glReadBuffer(GL11.GL_FRONT);
+        IntBuffer buffer = BufferUtils.createIntBuffer(width * height);
+        GL11.glReadPixels(0, 0, width, height, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
+    
+        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        int[] pixels = new int[width * height];
+        buffer.get(pixels);
+    
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                int pixel = pixels[y * width + x];
+                image.setRGB(x, height - y - 1, pixel);
+            }
+        }
+
+        bufferedImage = image;
     }
 
     private static byte[] convertToPNG(BufferedImage image) {
