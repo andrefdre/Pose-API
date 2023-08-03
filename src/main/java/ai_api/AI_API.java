@@ -273,15 +273,6 @@ public class AI_API implements ModInitializer, HttpHandler {
         }
     }
 
-    // Your further processing logic goes here.
-    // ...
-
-    // At this point, processedPixelData contains the bitmap data you need.
-
-    // You can also save the BufferedImage as a PNG or other formats if required:
-    // File outputFile = new File("output.png");
-    // ImageIO.write(bufferedImage, "PNG", outputFile);
-
     // -----------------------------------------------------------------------------------
     // //
     // --------------------- FUNCTION THAT HANDLES THE API REQUESTS
