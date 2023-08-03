@@ -99,7 +99,7 @@ public class AI_API implements ModInitializer, HttpHandler {
     // ------------------------ FUNCTIONS TO GET INFO FROM GAME -------------------------- //
     // ----------------------------------------------------------------------------------- //
 
-	public void getPos() {
+	private void getPos() {
 		if (client != null) {
             ClientPlayerEntity player = client.player;
             if (player != null) {
@@ -119,7 +119,7 @@ public class AI_API implements ModInitializer, HttpHandler {
         }
 	}
 
-    public void InputHandler() {
+    private void InputHandler() {
         // Register a client tick event to handle input on every game tick
             // Handle your mouse input here
             // if (client.mouse.wasLeftButtonClicked()) {
@@ -203,7 +203,7 @@ public class AI_API implements ModInitializer, HttpHandler {
             
     }
 
-    public void getInv() {
+    private void getInv() {
 		if (client != null) {
             PlayerEntity player = client.player;
             if (player != null) {
@@ -225,7 +225,7 @@ public class AI_API implements ModInitializer, HttpHandler {
 	    }
     }
 
-    public void captureScreenshot() {
+    private void captureScreenshot() {
         // Get the current framebuffer (the rendered image on the screen)
         int width = client.getWindow().getFramebufferWidth();
         int height = client.getWindow().getFramebufferHeight();
