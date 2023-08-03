@@ -37,16 +37,15 @@ import io.undertow.server.HttpServerExchange;
 import io.undertow.server.RoutingHandler;
 import io.undertow.util.Headers;
 
-
 public class AI_API implements ModInitializer, HttpHandler {
-	// This logger is used to write text to the console and the log file.
-	// It is considered best practice to use your mod id as the logger's name.
-	// That way, it's clear which mod wrote info, warnings, and errors.
+    // This logger is used to write text to the console and the log file.
+    // It is considered best practice to use your mod id as the logger's name.
+    // That way, it's clear which mod wrote info, warnings, and errors.
     public static final Logger LOGGER = LoggerFactory.getLogger("pose-api");
-	private static MinecraftClient client;
-    
+    private static MinecraftClient client;
+
     // variables for the player_actions functions
-    public static boolean left; 
+    public static boolean left;
     public static boolean right;
     public static boolean up;
     public static boolean down;
@@ -61,44 +60,41 @@ public class AI_API implements ModInitializer, HttpHandler {
     private static long window;
 
     // variables for the player_position functions
-	double x;
-	double y;
-	double z;
-	float yaw;
-	float pitch;
+    double x;
+    double y;
+    double z;
+    float yaw;
+    float pitch;
 
     // variables for the player_inventory functions
     List<Item> itemTypesList = new ArrayList<>();
-	List<Integer> itemCount = new ArrayList<>();
+    List<Integer> itemCount = new ArrayList<>();
 
-	private Undertow server;
+    private Undertow server;
 
-
-
-
-	@Override
-	public void onInitialize() {
-		// This code runs as soon as Minecraft is in a mod-load-ready state.
-		// However, some things (like resources) may still be uninitialized.
-		// Proceed with mild caution.
-		LOGGER.info("Pose API initialized!");
-		client = MinecraftClient.getInstance();
+    @Override
+    public void onInitialize() {
+        // This code runs as soon as Minecraft is in a mod-load-ready state.
+        // However, some things (like resources) may still be uninitialized.
+        // Proceed with mild caution.
+        LOGGER.info("Pose API initialized!");
+        client = MinecraftClient.getInstance();
 
         int width = 720;
         int height = 640;
         initGL(width, height);
 
-		ClientTickEvents.START_CLIENT_TICK.register(client -> {
-			getPos();
+        ClientTickEvents.START_CLIENT_TICK.register(client -> {
+            getPos();
             getInv();
             InputHandler();
             captureScreenshot();
-		});
+        });
 
-		// Create an Undertow server instance
+        // Create an Undertow server instance
         server = Undertow.builder()
-                .addHttpListener(8070, "localhost")  // Set the desired port and hostname
-                .setHandler(getRoutingHandler())  // Set the routing handler as the request handler
+                .addHttpListener(8070, "localhost") // Set the desired port and hostname
+                .setHandler(getRoutingHandler()) // Set the routing handler as the request handler
                 .build();
 
         // Start the server
@@ -118,150 +114,144 @@ public class AI_API implements ModInitializer, HttpHandler {
         GL.createCapabilities();
     }
 
-    // ----------------------------------------------------------------------------------- //
-    // ------------------------ FUNCTIONS TO GET INFO FROM GAME -------------------------- //
-    // ----------------------------------------------------------------------------------- //
+    // -----------------------------------------------------------------------------------
+    // //
+    // ------------------------ FUNCTIONS TO GET INFO FROM GAME
+    // -------------------------- //
+    // -----------------------------------------------------------------------------------
+    // //
 
-	private void getPos() {
-		if (client != null) {
+    private void getPos() {
+        if (client != null) {
             ClientPlayerEntity player = client.player;
             if (player != null) {
                 Vec3d pos = player.getPos();
-				yaw = player.getYaw() % 360.0f;
-				pitch = player.getPitch();
+                yaw = player.getYaw() % 360.0f;
+                pitch = player.getPitch();
 
-				if (yaw < 0)
+                if (yaw < 0)
                     yaw += 360.0f;
 
-				x = pos.x;
-				y = pos.y;
-				z = pos.z;
+                x = pos.x;
+                y = pos.y;
+                z = pos.z;
 
-                // LOGGER.info("Player position: X=" + pos.x + " Y=" + pos.y + " Z=" + pos.z + " Yaw=" + yaw + " Pitch=" + pitch);
+                // LOGGER.info("Player position: X=" + pos.x + " Y=" + pos.y + " Z=" + pos.z + "
+                // Yaw=" + yaw + " Pitch=" + pitch);
             }
         }
-	}
+    }
 
     private void InputHandler() {
         // Register a client tick event to handle input on every game tick
-            // Handle your mouse input here
-            // if (client.mouse.wasLeftButtonClicked()) {
-            if (client.mouse.wasLeftButtonClicked()) {
-                // Left mouse button was clicked
-                // LOGGER.info("Left mouse button clicked!");
-                left_mouse = true;
-            }
-            else {
-                left_mouse = false;
-            }
+        // Handle your mouse input here
+        // if (client.mouse.wasLeftButtonClicked()) {
+        if (client.mouse.wasLeftButtonClicked()) {
+            // Left mouse button was clicked
+            // LOGGER.info("Left mouse button clicked!");
+            left_mouse = true;
+        } else {
+            left_mouse = false;
+        }
 
-            // if (client.mouse.wasRightButtonClicked()) {
-            if (client.mouse.wasRightButtonClicked()) {
-                // Left mouse button was clicked
-                // LOGGER.info("Right mouse button clicked!");
-                right_mouse = true;
-            }
-            else {
-                right_mouse = false;
-            }
+        // if (client.mouse.wasRightButtonClicked()) {
+        if (client.mouse.wasRightButtonClicked()) {
+            // Left mouse button was clicked
+            // LOGGER.info("Right mouse button clicked!");
+            right_mouse = true;
+        } else {
+            right_mouse = false;
+        }
 
-            if (client.options.jumpKey.isPressed()) {
-                // LOGGER.info("Bro is jumping!");
-                jump = true;
-            }
-            else {
-                jump = false;
-            }
+        if (client.options.jumpKey.isPressed()) {
+            // LOGGER.info("Bro is jumping!");
+            jump = true;
+        } else {
+            jump = false;
+        }
 
-            if (client.options.sprintKey.isPressed()) {
-                // LOGGER.info("My man is sprinting!");
-                sprint = true;
-            }
-            else {
-                sprint = false;
-            }
+        if (client.options.sprintKey.isPressed()) {
+            // LOGGER.info("My man is sprinting!");
+            sprint = true;
+        } else {
+            sprint = false;
+        }
 
-            if (client.options.forwardKey.isPressed()) {
-                // LOGGER.info("Moving forward!");
-                up = true;
-            }
-            else {
-                up = false;
-            }
+        if (client.options.forwardKey.isPressed()) {
+            // LOGGER.info("Moving forward!");
+            up = true;
+        } else {
+            up = false;
+        }
 
-            if (client.options.backKey.isPressed()) {
-                // LOGGER.info("Moving backwards!");
-                down = true;
-            }
-            else {
-                down = false;
-            }
+        if (client.options.backKey.isPressed()) {
+            // LOGGER.info("Moving backwards!");
+            down = true;
+        } else {
+            down = false;
+        }
 
-            if (client.options.leftKey.isPressed()) {
-                // LOGGER.info("Moving left!");
-                left = true;
-            }    
-            else {
-                left = false;
-            }           
+        if (client.options.leftKey.isPressed()) {
+            // LOGGER.info("Moving left!");
+            left = true;
+        } else {
+            left = false;
+        }
 
-            if (client.options.rightKey.isPressed()) {
-                // LOGGER.info("Moving right!");
-                right = true;
-            }
-            else {
-                right = false;
-            }
+        if (client.options.rightKey.isPressed()) {
+            // LOGGER.info("Moving right!");
+            right = true;
+        } else {
+            right = false;
+        }
 
-            if (client.options.sneakKey.isPressed()) {
-                // LOGGER.info("Crouching!");
-                crouch = true;
-            }   
-            else {
-                crouch = false;
-            }      
-            mouse_x = client.mouse.getX();
-            mouse_y = client.mouse.getY();
-            // LOGGER.info("Mouse X: " + mouse_x + ", Mouse Y: " + mouse_y);
-            
+        if (client.options.sneakKey.isPressed()) {
+            // LOGGER.info("Crouching!");
+            crouch = true;
+        } else {
+            crouch = false;
+        }
+        mouse_x = client.mouse.getX();
+        mouse_y = client.mouse.getY();
+        // LOGGER.info("Mouse X: " + mouse_x + ", Mouse Y: " + mouse_y);
+
     }
 
     private void getInv() {
-		if (client != null) {
+        if (client != null) {
             PlayerEntity player = client.player;
             if (player != null) {
-				DefaultedList<ItemStack> playerInventory = player.getInventory().main;
-				// LOGGER.info("Player Inventory:");
+                DefaultedList<ItemStack> playerInventory = player.getInventory().main;
+                // LOGGER.info("Player Inventory:");
                 itemTypesList.clear();
 
-
-				for (int i = 0; i < playerInventory.size(); i++) {
-					ItemStack itemStack = playerInventory.get(i);
-					// LOGGER.info("Slot " + i + ": " + itemStack.getItem().getTranslationKey() + " (Count: " + itemStack.getCount() + ")");
-					Item item = itemStack.getItem();
+                for (int i = 0; i < playerInventory.size(); i++) {
+                    ItemStack itemStack = playerInventory.get(i);
+                    // LOGGER.info("Slot " + i + ": " + itemStack.getItem().getTranslationKey() + "
+                    // (Count: " + itemStack.getCount() + ")");
+                    Item item = itemStack.getItem();
                     int amount = player.getInventory().count(item);
-					itemTypesList.add(item);
+                    itemTypesList.add(item);
                     itemCount.add(amount);
-				}
-				
-			}
-	    }
+                }
+
+            }
+        }
     }
-    
 
     private void captureScreenshot() {
         // Get the current framebuffer (the rendered image on the screen)
         int width = client.getWindow().getFramebufferWidth();
         int height = client.getWindow().getFramebufferHeight();
-        
+
         GL11.glReadBuffer(GL11.GL_FRONT);
         IntBuffer buffer = BufferUtils.createIntBuffer(width * height);
         GL11.glReadPixels(0, 0, width, height, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
-    
+
         BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         int[] pixels = new int[width * height];
         buffer.get(pixels);
-    
+
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
                 int pixel = pixels[y * width + x];
@@ -283,22 +273,23 @@ public class AI_API implements ModInitializer, HttpHandler {
         }
     }
 
+    // Your further processing logic goes here.
+    // ...
 
-        // Your further processing logic goes here.
-        // ...
+    // At this point, processedPixelData contains the bitmap data you need.
 
-        // At this point, processedPixelData contains the bitmap data you need.
+    // You can also save the BufferedImage as a PNG or other formats if required:
+    // File outputFile = new File("output.png");
+    // ImageIO.write(bufferedImage, "PNG", outputFile);
 
-        // You can also save the BufferedImage as a PNG or other formats if required:
-        // File outputFile = new File("output.png");
-        // ImageIO.write(bufferedImage, "PNG", outputFile);
-    
+    // -----------------------------------------------------------------------------------
+    // //
+    // --------------------- FUNCTION THAT HANDLES THE API REQUESTS
+    // ---------------------- //
+    // -----------------------------------------------------------------------------------
+    // //
 
-    // ----------------------------------------------------------------------------------- //
-    // --------------------- FUNCTION THAT HANDLES THE API REQUESTS ---------------------- //
-    // ----------------------------------------------------------------------------------- //
-
-	private RoutingHandler getRoutingHandler() {
+    private RoutingHandler getRoutingHandler() {
         // Create a routing handler to handle different API endpoints
         RoutingHandler routingHandler = new RoutingHandler();
 
@@ -321,55 +312,59 @@ public class AI_API implements ModInitializer, HttpHandler {
         return routingHandler;
     }
 
-
-    // ----------------------------------------------------------------------------------- //
-    // -------------------- FUNCTIONS THAT PRINT OUT INFO TO THE API --------------------- //
-    // ----------------------------------------------------------------------------------- //
+    // -----------------------------------------------------------------------------------
+    // //
+    // -------------------- FUNCTIONS THAT PRINT OUT INFO TO THE API
+    // --------------------- //
+    // -----------------------------------------------------------------------------------
+    // //
 
     private void handlePlayerRequest(HttpServerExchange exchange) {
         // Retrieve the player's position and orientation
         if (client != null) {
-                String playerData = "Player position: X=" + x + " Y=" + y + " Z=" + z +
-                        " Yaw=" + yaw + " Pitch=" + pitch;
+            String playerData = "Player position: X=" + x + " Y=" + y + " Z=" + z +
+                    " Yaw=" + yaw + " Pitch=" + pitch;
 
-                // Set the response content type and send the player data as the response
-                exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "text/plain");
-                exchange.getResponseSender().send(playerData);
-            }
+            // Set the response content type and send the player data as the response
+            exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "text/plain");
+            exchange.getResponseSender().send(playerData);
         }
+    }
 
     private void handlePlayerInvRequest(HttpServerExchange exchange) {
         // Retrieve the player's position and orientation
         if (client != null) {
-             
-			StringBuilder player_inventory = new StringBuilder();
+
+            StringBuilder player_inventory = new StringBuilder();
             player_inventory.append("Hotbar inventory: \n");
-            for (int i = 0; i < 10; i++) {					
-                player_inventory.append("Slot " + i + ": " + itemTypesList.get(i) + ", amount: " + itemCount.get(i) + "\n");
+            for (int i = 0; i < 10; i++) {
+                player_inventory
+                        .append("Slot " + i + ": " + itemTypesList.get(i) + ", amount: " + itemCount.get(i) + "\n");
             }
             player_inventory.append("\nRemaining inventory: \n");
-            for (int i = 10; i < itemTypesList.size(); i++) {					
-                player_inventory.append("Slot " + i + ": " + itemTypesList.get(i) + ", amount: " + itemCount.get(i) + "\n");
+            for (int i = 10; i < itemTypesList.size(); i++) {
+                player_inventory
+                        .append("Slot " + i + ": " + itemTypesList.get(i) + ", amount: " + itemCount.get(i) + "\n");
             }
             // Set the response content type and send the player data as the response
             exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "text/plain");
             ByteBuffer byteBuffer = StandardCharsets.UTF_8.encode(player_inventory.toString());
             exchange.getResponseSender().send(byteBuffer);
         }
-			
-    }   
+
+    }
 
     private void handlePlayerInputRequest(HttpServerExchange exchange) {
         // Retrieve the player's position and orientation
         if (client != null) {
-                
+
             StringBuilder player_actions = new StringBuilder();
-            
+
             player_actions.append("Right click status: " + right_mouse + "\n");
             player_actions.append("Left click status " + left_mouse + "\n");
             player_actions.append("Jump key status: " + jump + "\n");
-            player_actions.append("Crouch key status: " + crouch+ "\n");
-            player_actions.append("Sprint key status: "+ sprint + "\n");
+            player_actions.append("Crouch key status: " + crouch + "\n");
+            player_actions.append("Sprint key status: " + sprint + "\n");
             player_actions.append("W key status: " + up + "\n");
             player_actions.append("S key status: " + down + "\n");
             player_actions.append("A key status: " + left + "\n");
@@ -377,16 +372,16 @@ public class AI_API implements ModInitializer, HttpHandler {
             player_actions.append("\n");
             player_actions.append("Mouse X position: " + mouse_x + "\n");
             player_actions.append("Mouse Y position: " + mouse_y + "\n");
-                        
+
             // Set the response content type and send the player data as the response
             exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "text/plain");
             ByteBuffer byteBuffer = StandardCharsets.UTF_8.encode(player_actions.toString());
             exchange.getResponseSender().send(byteBuffer);
         }
-			
-    }  
-    
-     private static void handleImageRequest(HttpServerExchange exchange) {
+
+    }
+
+    private static void handleImageRequest(HttpServerExchange exchange) {
 
         // Convert the BufferedImage to a byte array (PNG format)
         byte[] imageData = convertToPNG(bufferedImage);
@@ -398,8 +393,6 @@ public class AI_API implements ModInitializer, HttpHandler {
         ByteBuffer byteBuffer = ByteBuffer.wrap(imageData);
         exchange.getResponseSender().send(byteBuffer);
     }
-
-
 
     @Override
     public void handleRequest(HttpServerExchange exchange) throws Exception {
