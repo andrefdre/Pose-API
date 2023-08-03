@@ -11,12 +11,15 @@ import net.minecraft.util.math.Vec3d;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 
 import java.util.List;
+
+import javax.imageio.ImageIO;
+
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.awt.image.BufferedImage;
-import java.awt.image.DataBufferInt;
-
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,6 +51,7 @@ public class AI_API implements ModInitializer, HttpHandler {
     public static boolean right_mouse;
     public static double mouse_x;
     public static double mouse_y;
+    private static BufferedImage bufferedImage;
 
     // variables for the player_position functions
 	double x;
@@ -220,29 +224,25 @@ public class AI_API implements ModInitializer, HttpHandler {
 			}
 	    }
     }
-    
+
     public void captureScreenshot() {
         // Get the current framebuffer (the rendered image on the screen)
         int width = client.getWindow().getFramebufferWidth();
         int height = client.getWindow().getFramebufferHeight();
         // int[] pixelData = new int[width * height];
         // client.getFramebuffer().readPixels(0, 0, width, height, true);
+        bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+    }
 
-        // Extract pixel data from the framebuffer into the pixelData array
-        // Note: This will store the data in the ARGB format
-
-        // At this point, you have the pixel data in the pixelData array
-        // You can convert this data into a BufferedImage or manipulate it as needed.
-        BufferedImage bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-        // bufferedImage.setRGB(0, 0, width, height, pixelData, 0, width);
-        int[] pixelData = ((DataBufferInt) bufferedImage.getRaster().getDataBuffer()).getData();
-        // Now, you can further process the BufferedImage as needed.
-        // For example, you can manipulate the pixel data, apply filters, etc.
-
-        // After processing, you can access the pixel data as follows:
-        // int[] processedPixelData = ((DataBufferInt) bufferedImage.getRaster().getDataBuffer()).getData();        
-        LOGGER.info(pixelData.toString());
-
+    private static byte[] convertToPNG(BufferedImage image) {
+        try {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ImageIO.write(image, "png", baos);
+            return baos.toByteArray();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
 
@@ -274,6 +274,10 @@ public class AI_API implements ModInitializer, HttpHandler {
         });
         routingHandler.get("/player_actions", exchange -> {
             handlePlayerInputRequest(exchange);
+        });
+
+        routingHandler.get("/image", exchange -> {
+            handleImageRequest(exchange);
         });
 
         return routingHandler;
@@ -342,7 +346,21 @@ public class AI_API implements ModInitializer, HttpHandler {
             exchange.getResponseSender().send(byteBuffer);
         }
 			
-    }    
+    }  
+    
+     private static void handleImageRequest(HttpServerExchange exchange) {
+
+        // Convert the BufferedImage to a byte array (PNG format)
+        byte[] imageData = convertToPNG(bufferedImage);
+
+        // Set the response content type to "image/png"
+        exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "image/png");
+
+        // Send the image data in the response
+        ByteBuffer byteBuffer = ByteBuffer.wrap(imageData);
+        exchange.getResponseSender().send(byteBuffer);
+    }
+
 
 
     @Override
