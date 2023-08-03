@@ -65,11 +65,13 @@ dependencies {
 
 	implementation include ('io.undertow:undertow-core:2.2.12.Final')
 
+}
+
 	// Uncomment the following line to enable the deprecated Fabric API modules. 
 	// These are included in the Fabric API production distribution and allow you to update your mod to the latest modules at a later more convenient time.
 
 	// modImplementation "net.fabricmc.fabric-api:fabric-api-deprecated:${project.fabric_version}"
-}
+// }
 
 processResources {
 	inputs.property "version", project.version
