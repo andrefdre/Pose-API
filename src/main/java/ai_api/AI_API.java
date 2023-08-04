@@ -10,6 +10,15 @@ import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.Vec3d;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 
+// libraries to generate JSONs
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import ai_api.InvJson;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import java.util.List;
 
 import javax.imageio.ImageIO;
@@ -38,6 +47,7 @@ import io.undertow.server.RoutingHandler;
 import io.undertow.util.Headers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
 
 public class AI_API implements ModInitializer, HttpHandler {
     // This logger is used to write text to the console and the log file.
@@ -343,29 +353,40 @@ public class AI_API implements ModInitializer, HttpHandler {
         // Retrieve the player's position and orientation
         if (client != null) {
 
-            StringBuilder player_inventory = new StringBuilder();
-            player_inventory.append("Hotbar inventory: \n");
-            for (int i = 0; i < 10; i++) {
-                player_inventory
-                        .append("Slot " + i + ": " + itemTypesList.get(i) + ", amount: " + itemCount.get(i) + "\n");
+            ObjectMapper mapper = new ObjectMapper();
+
+            Map<String, InvJson> slotsMap = new LinkedHashMap<>();
+
+            for(int i = 0; i < itemTypesList.size(); i++) {
+                slotsMap.put("Slot " + i, new InvJson(itemCount.get(i), itemTypesList.get(i).toString()));
             }
-            player_inventory.append("\nRemaining inventory: \n");
-            for (int i = 10; i < itemTypesList.size(); i++) {
-                player_inventory
-                        .append("Slot " + i + ": " + itemTypesList.get(i) + ", amount: " + itemCount.get(i) + "\n");
+
+            String jsonString;
+            try {
+                jsonString = mapper.writeValueAsString(slotsMap);
+            } catch (Exception e) {
+                e.printStackTrace(); // Handle the exception as needed
+                return;
             }
-            // Set the response content type and send the player data as the response
-            exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "text/plain");
-            ByteBuffer byteBuffer = StandardCharsets.UTF_8.encode(player_inventory.toString());
+
+            // Convert my JSON to a byte buffer, in order for it to be properly sent through the api
+            byte[] jsonDataBytes = jsonString.getBytes(StandardCharsets.UTF_8);
+            ByteBuffer byteBuffer = ByteBuffer.wrap(jsonDataBytes);
+
+            // Send the encoded JSON
+            exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
             exchange.getResponseSender().send(byteBuffer);
+
         }
-
     }
+ 
 
+    
     private void handlePlayerInputRequest(HttpServerExchange exchange) {
+        
         // Retrieve the player's position and orientation
         if (client != null) {
-
+          
             ObjectMapper objectMapper = new ObjectMapper();
             ObjectNode player_actions = objectMapper.createObjectNode();
 
