@@ -36,6 +36,8 @@ import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.RoutingHandler;
 import io.undertow.util.Headers;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class AI_API implements ModInitializer, HttpHandler {
     // This logger is used to write text to the console and the log file.
@@ -313,12 +315,27 @@ public class AI_API implements ModInitializer, HttpHandler {
     private void handlePlayerRequest(HttpServerExchange exchange) {
         // Retrieve the player's position and orientation
         if (client != null) {
-            String playerData = "Player position: X=" + x + " Y=" + y + " Z=" + z +
-                    " Yaw=" + yaw + " Pitch=" + pitch;
+            ObjectMapper objectMapper = new ObjectMapper();
+            ObjectNode playerData = objectMapper.createObjectNode();
 
-            // Set the response content type and send the player data as the response
-            exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "text/plain");
-            exchange.getResponseSender().send(playerData);
+            // Populate the JSON object with player data
+            playerData.put("x", x);
+            playerData.put("y", y);
+            playerData.put("z", z);
+            playerData.put("yaw", yaw);
+            playerData.put("pitch", pitch);
+
+            try {
+                // Convert JSON object to JSON string
+                String jsonData = objectMapper.writeValueAsString(playerData);
+    
+                // Set the response content type to JSON and send the JSON data as the response
+                exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
+                exchange.getResponseSender().send(jsonData);
+            } catch (Exception e) {
+                e.printStackTrace();
+                // Handle exception if JSON conversion fails
+            }
         }
     }
 
@@ -349,25 +366,33 @@ public class AI_API implements ModInitializer, HttpHandler {
         // Retrieve the player's position and orientation
         if (client != null) {
 
-            StringBuilder player_actions = new StringBuilder();
+            ObjectMapper objectMapper = new ObjectMapper();
+            ObjectNode player_actions = objectMapper.createObjectNode();
 
-            player_actions.append("Right click status: " + right_mouse + "\n");
-            player_actions.append("Left click status " + left_mouse + "\n");
-            player_actions.append("Jump key status: " + jump + "\n");
-            player_actions.append("Crouch key status: " + crouch + "\n");
-            player_actions.append("Sprint key status: " + sprint + "\n");
-            player_actions.append("W key status: " + up + "\n");
-            player_actions.append("S key status: " + down + "\n");
-            player_actions.append("A key status: " + left + "\n");
-            player_actions.append("D key status: " + right + "\n");
-            player_actions.append("\n");
-            player_actions.append("Mouse X position: " + mouse_x + "\n");
-            player_actions.append("Mouse Y position: " + mouse_y + "\n");
+            player_actions.put("Right_click" , right_mouse);
+            player_actions.put("Left_click" , left_mouse);
+            player_actions.put("Jump_key" , jump);
+            player_actions.put("Crouch_key" , crouch);
+            player_actions.put("Sprint_key" , sprint);
+            player_actions.put("W_key" , up);
+            player_actions.put("S_key" , down);
+            player_actions.put("A_key" , left);
+            player_actions.put("D_key" , right);
+            player_actions.put("Mouse_X_position" , mouse_x);
+            player_actions.put("Mouse_Y_position" , mouse_y);
 
             // Set the response content type and send the player data as the response
-            exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "text/plain");
-            ByteBuffer byteBuffer = StandardCharsets.UTF_8.encode(player_actions.toString());
-            exchange.getResponseSender().send(byteBuffer);
+            try {
+                // Convert JSON object to JSON string
+                String jsonData = objectMapper.writeValueAsString(player_actions);
+    
+                // Set the response content type to JSON and send the JSON data as the response
+                exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
+                exchange.getResponseSender().send(jsonData);
+            } catch (Exception e) {
+                e.printStackTrace();
+                // Handle exception if JSON conversion fails
+            }
         }
 
     }

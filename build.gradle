@@ -62,8 +62,11 @@ dependencies {
 	include 'org.jboss.xnio:xnio-api:3.8.4.Final'
 	include 'org.wildfly.client:wildfly-client-config:1.0.1.Final'
 	include 'org.wildfly.common:wildfly-common:1.5.2.Final'
+	include 'com.fasterxml.jackson.core:jackson-annotations:2.10.0'
+	include 'com.fasterxml.jackson.core:jackson-core:2.10.0'
 
 	implementation include ('io.undertow:undertow-core:2.2.12.Final')
+	implementation include ('com.fasterxml.jackson.core:jackson-databind:2.10.0')
 
 }
 
