@@ -378,8 +378,8 @@ public class AI_API implements ModInitializer, HttpHandler {
             player_actions.put("S_key" , down);
             player_actions.put("A_key" , left);
             player_actions.put("D_key" , right);
-            player_actions.put("Mouse_X_position: " , mouse_x);
-            player_actions.put("Mouse_Y_position: " , mouse_y);
+            player_actions.put("Mouse_X_position" , mouse_x);
+            player_actions.put("Mouse_Y_position" , mouse_y);
 
             // Set the response content type and send the player data as the response
             try {
