@@ -68,9 +68,6 @@ dependencies {
 	implementation include ('io.undertow:undertow-core:2.2.12.Final')
 	implementation include ('com.fasterxml.jackson.core:jackson-databind:2.10.0')
 
-	// JSON java library
-	implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.2'
-
 }
 
 	// Uncomment the following line to enable the deprecated Fabric API modules. 
