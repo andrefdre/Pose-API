@@ -10,6 +10,15 @@ import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.Vec3d;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 
+// libraries to generate JSONs
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import ai_api.InvJson;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import java.util.List;
 
 import javax.imageio.ImageIO;
@@ -36,6 +45,7 @@ import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.RoutingHandler;
 import io.undertow.util.Headers;
+
 
 public class AI_API implements ModInitializer, HttpHandler {
     // This logger is used to write text to the console and the log file.
@@ -326,48 +336,73 @@ public class AI_API implements ModInitializer, HttpHandler {
         // Retrieve the player's position and orientation
         if (client != null) {
 
-            StringBuilder player_inventory = new StringBuilder();
-            player_inventory.append("Hotbar inventory: \n");
-            for (int i = 0; i < 10; i++) {
-                player_inventory
-                        .append("Slot " + i + ": " + itemTypesList.get(i) + ", amount: " + itemCount.get(i) + "\n");
+            ObjectMapper mapper = new ObjectMapper();
+
+            Map<String, InvJson> slotsMap = new LinkedHashMap<>();
+
+            for(int i = 0; i < itemTypesList.size(); i++) {
+                slotsMap.put("Slot " + i, new InvJson(itemCount.get(i), itemTypesList.get(i).toString()));
             }
-            player_inventory.append("\nRemaining inventory: \n");
-            for (int i = 10; i < itemTypesList.size(); i++) {
-                player_inventory
-                        .append("Slot " + i + ": " + itemTypesList.get(i) + ", amount: " + itemCount.get(i) + "\n");
+
+            String jsonString;
+            try {
+                jsonString = mapper.writeValueAsString(slotsMap);
+            } catch (Exception e) {
+                e.printStackTrace(); // Handle the exception as needed
+                return;
             }
-            // Set the response content type and send the player data as the response
-            exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "text/plain");
-            ByteBuffer byteBuffer = StandardCharsets.UTF_8.encode(player_inventory.toString());
+
+            // Convert my JSON to a byte buffer, in order for it to be properly sent through the api
+            byte[] jsonDataBytes = jsonString.getBytes(StandardCharsets.UTF_8);
+            ByteBuffer byteBuffer = ByteBuffer.wrap(jsonDataBytes);
+
+            // Send the encoded JSON
+            exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
             exchange.getResponseSender().send(byteBuffer);
+
         }
-
     }
+ 
 
+    
     private void handlePlayerInputRequest(HttpServerExchange exchange) {
+        
         // Retrieve the player's position and orientation
         if (client != null) {
 
-            StringBuilder player_actions = new StringBuilder();
+            // create `ObjectMapper` instance
+            ObjectMapper mapper = new ObjectMapper();
+            // create a JSON object
+            ObjectNode KeyValues= mapper.createObjectNode();
+            KeyValues.put("mouse_right", right_mouse);
+            KeyValues.put("mouse_left", left_mouse);
+            KeyValues.put("key_jump", jump);
+            KeyValues.put("key_crouch", crouch);
+            KeyValues.put("key_sprint", sprint);
+            KeyValues.put("key_w", up);
+            KeyValues.put("key_s", down);
+            KeyValues.put("key_a", left);
+            KeyValues.put("key_d", right);
+            KeyValues.put("mouse_x_position", mouse_x);
+            KeyValues.put("mouse_y_position", mouse_y);
 
-            player_actions.append("Right click status: " + right_mouse + "\n");
-            player_actions.append("Left click status " + left_mouse + "\n");
-            player_actions.append("Jump key status: " + jump + "\n");
-            player_actions.append("Crouch key status: " + crouch + "\n");
-            player_actions.append("Sprint key status: " + sprint + "\n");
-            player_actions.append("W key status: " + up + "\n");
-            player_actions.append("S key status: " + down + "\n");
-            player_actions.append("A key status: " + left + "\n");
-            player_actions.append("D key status: " + right + "\n");
-            player_actions.append("\n");
-            player_actions.append("Mouse X position: " + mouse_x + "\n");
-            player_actions.append("Mouse Y position: " + mouse_y + "\n");
+            // Convert my JSON object to a JSON string
+            String jsonString;
+            try {
+                jsonString = mapper.writeValueAsString(KeyValues);
+            } catch (Exception e) {
+                e.printStackTrace(); // Handle the exception as needed
+                return;
+            }
 
-            // Set the response content type and send the player data as the response
-            exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "text/plain");
-            ByteBuffer byteBuffer = StandardCharsets.UTF_8.encode(player_actions.toString());
+            // Convert my JSON to a byte buffer, in order for it to be properly sent through the api
+            byte[] jsonDataBytes = jsonString.getBytes(StandardCharsets.UTF_8);
+            ByteBuffer byteBuffer = ByteBuffer.wrap(jsonDataBytes);
+
+            // Send the encoded JSON
+            exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
             exchange.getResponseSender().send(byteBuffer);
+
         }
 
     }
