@@ -236,6 +236,7 @@ public class AI_API implements ModInitializer, HttpHandler {
                 DefaultedList<ItemStack> playerInventory = player.getInventory().main;
                 // LOGGER.info("Player Inventory:");
                 itemTypesList.clear();
+                itemCount.clear();
 
                 for (int i = 0; i < playerInventory.size(); i++) {
                     ItemStack itemStack = playerInventory.get(i);
@@ -243,6 +244,7 @@ public class AI_API implements ModInitializer, HttpHandler {
                     // (Count: " + itemStack.getCount() + ")");
                     Item item = itemStack.getItem();
                     int amount = player.getInventory().count(item);
+                    LOGGER.info("Amount" + amount);
                     itemTypesList.add(item);
                     itemCount.add(amount);
                 }
