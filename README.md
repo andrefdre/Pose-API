@@ -54,7 +54,7 @@
   - <b>Player inventory</b>: Hotbar and remaining inventory;
   - <b>Key inputs</b>: constantly monitor main key inpouts such as WASD, jump or right and left click;
   - <b>Gameplay screenshots</b>: able to take screenshots of the current gameplay.
-- All this info is exported using a Rest API placed in localhost:8070.
+- All this info is exported using a Rest API placed in `localhost:8070`.
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ## How To Use
