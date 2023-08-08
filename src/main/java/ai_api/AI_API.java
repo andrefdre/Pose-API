@@ -1,5 +1,6 @@
 package ai_api;
 
+// Imports for the Minecraft API
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
@@ -10,32 +11,27 @@ import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.Vec3d;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 
-// libraries to generate JSONs
+// Imports the JSON libraries / JSON building objects
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import ai_api.InvJson;
-
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import java.util.List;
-
-import javax.imageio.ImageIO;
-
+// Imports for the HTTP server
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
+// Imports for the OpenGL screenshot
 import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
 
+// Imports for the logging system
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,18 +41,23 @@ import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.RoutingHandler;
 import io.undertow.util.Headers;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+
+// Other imports
+import java.util.List;
+import java.util.ArrayList;
+import javax.imageio.ImageIO;
 
 
 public class AI_API implements ModInitializer, HttpHandler {
+    
     // This logger is used to write text to the console and the log file.
     // It is considered best practice to use your mod id as the logger's name.
     // That way, it's clear which mod wrote info, warnings, and errors.
+
     public static final Logger LOGGER = LoggerFactory.getLogger("pose-api");
     private static MinecraftClient client;
 
-    // variables for the player_actions functions
+    // Variables for the player_actions functions
     public static boolean left;
     public static boolean right;
     public static boolean up;
@@ -71,24 +72,25 @@ public class AI_API implements ModInitializer, HttpHandler {
     private static BufferedImage bufferedImage;
     private static long window;
 
-    // variables for the player_position functions
+    // Variables for the player_position functions
     double x;
     double y;
     double z;
     float yaw;
     float pitch;
 
-    // variables for the player_inventory functions
+    // Variables for the player_inventory functions
     List<Item> itemTypesList = new ArrayList<>();
     List<Integer> itemCount = new ArrayList<>();
 
+    // Variable for the HTTP server
     private Undertow server;
 
     @Override
     public void onInitialize() {
+        
         // This code runs as soon as Minecraft is in a mod-load-ready state.
         // However, some things (like resources) may still be uninitialized.
-        // Proceed with mild caution.
         LOGGER.info("Pose API initialized!");
         client = MinecraftClient.getInstance();
 
@@ -96,6 +98,7 @@ public class AI_API implements ModInitializer, HttpHandler {
         int height = 640;
         initGL(width, height);
 
+        // Functions that get executed every tick of the game
         ClientTickEvents.START_CLIENT_TICK.register(client -> {
             getPos();
             getInv();
@@ -114,6 +117,7 @@ public class AI_API implements ModInitializer, HttpHandler {
 
     }
 
+
     private static void initGL(int width, int height) {
         if (!GLFW.glfwInit()) {
             throw new IllegalStateException("Unable to initialize GLFW");
@@ -126,13 +130,12 @@ public class AI_API implements ModInitializer, HttpHandler {
         GL.createCapabilities();
     }
 
-    // -----------------------------------------------------------------------------------
-    // //
-    // ------------------------ FUNCTIONS TO GET INFO FROM GAME
-    // -------------------------- //
-    // -----------------------------------------------------------------------------------
-    // //
 
+    // ----------------------------------------------------------------------------------- //
+    // ------------------------ FUNCTIONS TO GET INFO FROM GAME -------------------------- //
+    // ----------------------------------------------------------------------------------- // 
+
+    // Function that gets us the position of the player
     private void getPos() {
         if (client != null) {
             ClientPlayerEntity player = client.player;
@@ -154,94 +157,78 @@ public class AI_API implements ModInitializer, HttpHandler {
         }
     }
 
+
+    // Function that gets us the player's input
     private void InputHandler() {
-        // Register a client tick event to handle input on every game tick
-        // Handle your mouse input here
-        // if (client.mouse.wasLeftButtonClicked()) {
+
         if (client.mouse.wasLeftButtonClicked()) {
-            // Left mouse button was clicked
-            // LOGGER.info("Left mouse button clicked!");
             left_mouse = true;
         } else {
             left_mouse = false;
         }
-
-        // if (client.mouse.wasRightButtonClicked()) {
         if (client.mouse.wasRightButtonClicked()) {
-            // Left mouse button was clicked
-            // LOGGER.info("Right mouse button clicked!");
             right_mouse = true;
         } else {
             right_mouse = false;
         }
-
         if (client.options.jumpKey.isPressed()) {
-            // LOGGER.info("Bro is jumping!");
             jump = true;
         } else {
             jump = false;
         }
-
         if (client.options.sprintKey.isPressed()) {
-            // LOGGER.info("My man is sprinting!");
             sprint = true;
         } else {
             sprint = false;
         }
-
         if (client.options.forwardKey.isPressed()) {
-            // LOGGER.info("Moving forward!");
             up = true;
         } else {
             up = false;
         }
-
         if (client.options.backKey.isPressed()) {
-            // LOGGER.info("Moving backwards!");
             down = true;
         } else {
             down = false;
         }
-
         if (client.options.leftKey.isPressed()) {
-            // LOGGER.info("Moving left!");
             left = true;
         } else {
             left = false;
         }
-
         if (client.options.rightKey.isPressed()) {
-            // LOGGER.info("Moving right!");
             right = true;
         } else {
             right = false;
         }
-
         if (client.options.sneakKey.isPressed()) {
-            // LOGGER.info("Crouching!");
             crouch = true;
         } else {
             crouch = false;
         }
         mouse_x = client.mouse.getX();
         mouse_y = client.mouse.getY();
+
         // LOGGER.info("Mouse X: " + mouse_x + ", Mouse Y: " + mouse_y);
 
     }
 
+
+    // Function that gets us the player's inventory
     private void getInv() {
         if (client != null) {
             PlayerEntity player = client.player;
             if (player != null) {
                 DefaultedList<ItemStack> playerInventory = player.getInventory().main;
-                // LOGGER.info("Player Inventory:");
                 itemTypesList.clear();
                 itemCount.clear();
 
                 for (int i = 0; i < playerInventory.size(); i++) {
                     ItemStack itemStack = playerInventory.get(i);
+                    
                     // LOGGER.info("Slot " + i + ": " + itemStack.getItem().getTranslationKey() + "
                     // (Count: " + itemStack.getCount() + ")");
+
                     Item item = itemStack.getItem();
                     int amount = player.getInventory().count(item);
                     LOGGER.info("Amount" + amount);
@@ -253,7 +240,9 @@ public class AI_API implements ModInitializer, HttpHandler {
         }
     }
 
+    // Function that gets us a screenshot of the game
     private void captureScreenshot() {
+
         // Get the current framebuffer (the rendered image on the screen)
         int width = client.getWindow().getFramebufferWidth();
         int height = client.getWindow().getFramebufferHeight();
@@ -276,6 +265,7 @@ public class AI_API implements ModInitializer, HttpHandler {
         bufferedImage = image;
     }
 
+    // Function that converts a BufferedImage to a byte array (PNG format)
     private static byte[] convertToPNG(BufferedImage image) {
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -287,12 +277,10 @@ public class AI_API implements ModInitializer, HttpHandler {
         }
     }
 
-    // -----------------------------------------------------------------------------------
-    // //
-    // --------------------- FUNCTION THAT HANDLES THE API REQUESTS
-    // ---------------------- //
-    // -----------------------------------------------------------------------------------
-    // //
+    
+    // ----------------------------------------------------------------------------------- //
+    // --------------------- FUNCTION THAT HANDLES THE API REQUESTS ---------------------- //
+    // ----------------------------------------------------------------------------------- //
 
     private RoutingHandler getRoutingHandler() {
         // Create a routing handler to handle different API endpoints
@@ -317,12 +305,10 @@ public class AI_API implements ModInitializer, HttpHandler {
         return routingHandler;
     }
 
-    // -----------------------------------------------------------------------------------
-    // //
-    // -------------------- FUNCTIONS THAT PRINT OUT INFO TO THE API
-    // --------------------- //
-    // -----------------------------------------------------------------------------------
-    // //
+
+    // ----------------------------------------------------------------------------------- //
+    // -------------------- FUNCTIONS THAT PRINT OUT INFO TO THE API --------------------- //
+    // ----------------------------------------------------------------------------------- //
 
     private void handlePlayerRequest(HttpServerExchange exchange) {
         // Retrieve the player's position and orientation
@@ -346,7 +332,6 @@ public class AI_API implements ModInitializer, HttpHandler {
                 exchange.getResponseSender().send(jsonData);
             } catch (Exception e) {
                 e.printStackTrace();
-                // Handle exception if JSON conversion fails
             }
         }
     }
@@ -382,8 +367,6 @@ public class AI_API implements ModInitializer, HttpHandler {
         }
     }
  
-
-    
     private void handlePlayerInputRequest(HttpServerExchange exchange) {
         
         // Retrieve the player's position and orientation
@@ -424,10 +407,8 @@ public class AI_API implements ModInitializer, HttpHandler {
 
         // Convert the BufferedImage to a byte array (PNG format)
         byte[] imageData = convertToPNG(bufferedImage);
-
         // Set the response content type to "image/png"
         exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "image/png");
-
         // Send the image data in the response
         ByteBuffer byteBuffer = ByteBuffer.wrap(imageData);
         exchange.getResponseSender().send(byteBuffer);
