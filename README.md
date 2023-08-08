@@ -14,7 +14,8 @@
   <br>
 </h1>
   <p align="center">
-    The Pose-Api mod is a custom Minecraft mod developed using the Minecraft Fabric modding platform. It allows to create an interface with the game to generate datasets for Deep-Learning.
+    The Pose-Api mod is a custom Minecraft mod developed using the Minecraft Fabric modding platform. It allows you to retrieve a series of important info regarding your in-game character.
+    Its main purpose is to create a communication interface with the game to then generate datasets for Deep-Learning purposes.
     <br />
     <!-- <a href="https://github.com/andrefdre/Pose-API/wiki"><strong>Explore the Wiki »</strong></a> -->
     <!-- <br /> -->
@@ -46,10 +47,14 @@
 
 ## Key Features
 
-- This mod allows you to log the position of the character in the game.
-- The mod is developed using the Minecraft Fabric modding platform.
-- It also allows you to log the inventory contents.
-- It exports all the information using Rest API to localhost:8070
+- This mod allows you to retrieve key info from you in game character.
+- It is developed using the Minecraft Fabric modding platform.
+- It allows you to retrieve 4 key features from your in game character:
+  - <b>Player position</b>: coordinates (X,Y,Z) plus its rotation properties (yaw + pitch);
+  - <b>Player inventory</b>: Hotbar and remaining inventory;
+  - <b>Key inputs</b>: constantly monitor main key inpouts such as WASD, jump or right and left click;
+  - <b>Gameplay screenshots</b>: able to take screenshots of the current gameplay.
+- All this info is exported using a Rest API placed in localhost:8070.
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ## How To Use
@@ -58,10 +63,15 @@
 
 - Java 17
 - Any Java IDE, for example Intellij IDEA and Eclipse. You may also use any other code editors, such as Visual Studio Code.
+- If you use Virtual Studio Code, we recommend installing the Extension Pack for Java (https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-pack). To do so, simply lauch VS Code Quick Open ( Ctrl + P) and run:
+
+```
+ext install vscjava.vscode-java-pack
+```
 
 #### Installation
 
-To build the project you need to first install the sources of the Minecraft Fabric modding platform. But first if you using VsCode you need to run the following command in the terminal:
+To build the project you need to first install the sources of the Minecraft Fabric modding platform. But first if you using VS Code you need to run the following command in the terminal:
 
 ```
 ./gradlew vscode
@@ -78,6 +88,9 @@ To build the project you can use the following command:
 ```
 ./gradlew build
 ```
+
+Note that everytime you input a new dependency in the 'build.gradle' file, you should alays run the command that generates the sources, that allows you to update the dependencies.
+
 
 You can find the full instructions [here](https://fabricmc.net/wiki/tutorial:setup).
 
