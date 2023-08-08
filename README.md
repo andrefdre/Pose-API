@@ -63,7 +63,7 @@
 
 - Java 17
 - Any Java IDE, for example Intellij IDEA and Eclipse. You may also use any other code editors, such as Visual Studio Code.
-- If you use Virtual Studio Code, we recommend installing the Extension Pack for Java (https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-pack). To do so, simply lauch VS Code Quick Open ( Ctrl + P) and run:
+- If you use Virtual Studio Code, we recommend installing the Extension Pack for Java (https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-pack). To do so, simply launch VS Code Quick Open (Ctrl + P) and run:
 
 ```
 ext install vscjava.vscode-java-pack
@@ -89,7 +89,7 @@ To build the project you can use the following command:
 ./gradlew build
 ```
 
-Note that everytime you input a new dependency in the 'build.gradle' file, you should alays run the command that generates the sources, that allows you to update the dependencies.
+Note that everytime you input a new dependency in the 'build.gradle' file, you should always run the command that generates the sources. That allows you to update the dependencies.
 
 
 You can find the full instructions [here](https://fabricmc.net/wiki/tutorial:setup).
